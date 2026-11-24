@@ -11,7 +11,8 @@
 .
 ├── frontend/                 Vue 3 + Vite + TypeScript 前端
 │   ├── src/views/WorkbenchView.vue|tsx  全部模块共享工作台
-│   ├── src/data/modules.ts              18个业务模块配置
+│   ├── src/views/RecoveryScopeView.vue  恢复范围看板（按批次查可恢复范围）
+│   ├── src/data/modules.ts              19个业务模块配置
 │   ├── src/api/              统一请求封装
 │   └── vite.config.ts        dev server 配置（open: false）
 ├── backend/                  FastAPI（Python） 后端
@@ -66,12 +67,15 @@ npm run dev
 | 传输血缘 | `transfer_lineage` | 血缘链路 | 链路编号、源端编号、抽取窗口 |
 | 批次归档 | `history_archive` | 归档卷 | 归档编号、批次范围、归档路径 |
 | 历史重放 | `exchange_replay` | 重放任务 | 重放编号、归档编号、重放范围 |
+| 恢复范围看板 | `recovery_scope` | 恢复范围 | 看板编号、来源批次、归档卷 |
 | 时效监控 | `sla_monitor` | 时效指标 | 指标编号、源端编号、约定到达时限 |
 | 通道配置 | `channel_config` | 传输通道 | 通道编号、传输协议、并发连接数 |
 
 ## 约定
 
-- 全部模块共享`frontend/src/views/WorkbenchView.vue|tsx`和一套资源路由。
+- 全部模块共享`frontend/src/views/WorkbenchView.vue|tsx`和一套资源路由；恢复范围看板另有
+  `frontend/src/views/RecoveryScopeView.vue` 与 `/api/recovery_scope/*` 聚合接口，
+  按批次展示覆盖概览、可恢复清单与缺片记录，重放取片会记下每片来自哪个卷。
 - 每个模块仍保留独立`backend/app/services/<模块>.py`；纯前端保留
   `frontend/src/domain/<模块>.ts`，用于承载真实业务差异并维持36题位容量。
 - 列表接口统一返回 `{ items, total, page, size }`，动作接口统一返回 `{ ok, message }`。

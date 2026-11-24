@@ -3,6 +3,37 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.recovery_pieces import piece_credential
+
+# 恢复范围看板种子场景：同一历史批次 BATC-2024-11 出现在两个归档卷里，
+# 旧卷 HIST-0001 已校验且有完整血缘，第二卷 HIST-0002 缺一片（P3）。
+_RECOVERY_BATCH = "BATC-2024-11"
+_RECOVERY_SEED: list[dict[str, Any]] = []
+for _idx, (_volume, _version, _verify, _lineage, _missing) in enumerate([
+    ("HIST-0001", "v1.0", "已校验", "TRAN-9101", []),
+    ("HIST-0002", "v2.0", "待校验", "", [3]),
+]):
+    for _piece in range(1, 4):
+        _piece_code = f"{_RECOVERY_BATCH}-P{_piece}"
+        _range = f"行{(_piece - 1) * 5 + 1}-{(_piece - 1) * 5 + 5}"
+        _is_missing = _piece in _missing
+        _RECOVERY_SEED.append({
+            "id": len(_RECOVERY_SEED) + 1,
+            "status": "缺片待补" if _is_missing else "可恢复",
+            "pending": _is_missing,
+            "abnormal": _is_missing,
+            "看板编号": f"RECO-{len(_RECOVERY_SEED) + 1:04d}",
+            "来源批次": _RECOVERY_BATCH,
+            "归档卷": _volume,
+            "归档版本": _version,
+            "分片编号": _piece_code,
+            "成员范围": _range,
+            "校验凭据": "" if _is_missing else piece_credential(_RECOVERY_BATCH, _piece_code, _range),
+            "血缘链路": _lineage,
+            "卷校验状态": _verify,
+            "登记时间": f"2026-09-1{_idx} 09:00:0{_piece}",
+        })
+
 SEED_ROWS: dict[str, list[dict[str, Any]]] = {
     "source_register": [{'id': 1,
   'status': '草稿',
@@ -507,7 +538,19 @@ SEED_ROWS: dict[str, list[dict[str, Any]]] = {
   '目标编号': 'TRAN-0003',
   '字段契约': '传输血缘样例3',
   '血缘版本': '传输血缘样例3',
-  '采集时间': '2026-09-03'}],
+  '采集时间': '2026-09-03'},
+ {'id': 4,
+  'status': '已生效',
+  'pending': False,
+  'abnormal': False,
+  '链路编号': 'TRAN-9101',
+  '源端编号': 'SOUR-0003',
+  '抽取窗口': 'EXTR-0003',
+  '传输批次': 'BATC-2024-11',
+  '目标编号': 'TARG-0003',
+  '字段契约': 'FIEL-0003',
+  '血缘版本': 'v1.0',
+  '采集时间': '2026-09-10'}],
     "history_archive": [{'id': 1,
   'status': '草稿',
   'pending': True,
@@ -651,5 +694,6 @@ SEED_ROWS: dict[str, list[dict[str, Any]]] = {
   '超时秒数': '通道配置样例3',
   '加密方式': '通道配置样例3',
   '通道类型': '通道配置样例3',
-  '配置版本': '通道配置样例3'}]
+  '配置版本': '通道配置样例3'}],
+    "recovery_scope": [dict(row) for row in _RECOVERY_SEED],
 }

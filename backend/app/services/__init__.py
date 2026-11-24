@@ -18,6 +18,7 @@ from app.services.format_adapt import FormatAdaptService
 from app.services.transfer_lineage import TransferLineageService
 from app.services.history_archive import HistoryArchiveService
 from app.services.exchange_replay import ExchangeReplayService
+from app.services.recovery_scope import RecoveryScopeService
 from app.services.sla_monitor import SlaMonitorService
 from app.services.channel_config import ChannelConfigService
 
@@ -38,6 +39,7 @@ SERVICES: dict[str, BaseModuleService] = {
     "transfer_lineage": TransferLineageService(),
     "history_archive": HistoryArchiveService(),
     "exchange_replay": ExchangeReplayService(),
+    "recovery_scope": RecoveryScopeService(),
     "sla_monitor": SlaMonitorService(),
     "channel_config": ChannelConfigService(),
 }
